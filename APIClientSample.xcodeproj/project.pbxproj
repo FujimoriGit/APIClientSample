@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D9E0B1592E59EAC000FE07A5 /* Composition in Frameworks */ = {isa = PBXBuildFile; productRef = D9E0B1582E59EAC000FE07A5 /* Composition */; };
+		D9E0B15B2E59EAC000FE07A5 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = D9E0B15A2E59EAC000FE07A5 /* Domain */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D96260682E5973C10032299B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9E0B15B2E59EAC000FE07A5 /* Domain in Frameworks */,
+				D9E0B1592E59EAC000FE07A5 /* Composition in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = APIClientSample;
 			packageProductDependencies = (
+				D9E0B1582E59EAC000FE07A5 /* Composition */,
+				D9E0B15A2E59EAC000FE07A5 /* Domain */,
 			);
 			productName = APIClientSample;
 			productReference = D962605A2E5973BD0032299B /* APIClientSample.app */;
@@ -195,6 +204,8 @@
 			);
 			mainGroup = D96260512E5973BD0032299B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D962605B2E5973BD0032299B /* Products */;
 			projectDirPath = "";
@@ -550,6 +561,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D9E0B1582E59EAC000FE07A5 /* Composition */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Composition;
+		};
+		D9E0B15A2E59EAC000FE07A5 /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D96260522E5973BD0032299B /* Project object */;
 }
