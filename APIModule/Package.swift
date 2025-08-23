@@ -22,7 +22,10 @@ let package = Package(
         .target(
             name: "Domain",
             dependencies: [],
-            path: "Sources/Domain"
+            path: "Sources/Domain",
+            swiftSettings: [
+                .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug))
+            ]
         ),
         // Data層 I/O実装（API/DB等）を閉じ込める内部モジュール（productsに非公開）
         .target(
@@ -45,13 +48,19 @@ let package = Package(
                 .product(name: "Moya", package: "Moya")
             ],
             // 接続コードのみを分離し、関心の分離を明確化
-            path: "Sources/Composition"
+            path: "Sources/Composition",
+            swiftSettings: [
+                .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug))
+            ]
         ),
         // Data層の単体テスト
         .testTarget(
             name: "DataTests",
             dependencies: ["Data"],
-            path: "Tests/DataTests"
+            path: "Tests/DataTests",
+            swiftSettings: [
+                .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug))
+            ]
         )
     ]
 )
