@@ -8,7 +8,7 @@ let package = Package(
     platforms: [.iOS(.v18)],
     products: [
         .library(name: "Domain", targets: ["Domain"]),
-        .library(name: "Composition", targets: ["Composition"]),
+        .library(name: "Composition", targets: ["Composition"])
     ],
     dependencies: [
         .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
