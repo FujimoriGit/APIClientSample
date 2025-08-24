@@ -9,6 +9,6 @@ import Domain
 import Moya
 
 package final class APIClient: APIRequesting {
-    
+
     package init() {}
 }

@@ -1,0 +1,11 @@
+# Directory and file filters
+excluded:
+  - Resources
+
+opt_in_rules:
+  - attributes
+
+# Configurations
+nesting:
+  type_level:
+    warning: 2

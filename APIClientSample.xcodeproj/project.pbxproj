@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		D9E0B1592E59EAC000FE07A5 /* Composition in Frameworks */ = {isa = PBXBuildFile; productRef = D9E0B1582E59EAC000FE07A5 /* Composition */; };
 		D9E0B15B2E59EAC000FE07A5 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = D9E0B15A2E59EAC000FE07A5 /* Domain */; };
+		D9E5CE9D2E5AEC0F001503EB /* Composition in Frameworks */ = {isa = PBXBuildFile; productRef = D9E5CE9C2E5AEC0F001503EB /* Composition */; };
+		D9E5CE9F2E5AEC0F001503EB /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = D9E5CE9E2E5AEC0F001503EB /* Domain */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +59,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9E5CE9D2E5AEC0F001503EB /* Composition in Frameworks */,
 				D9E0B15B2E59EAC000FE07A5 /* Domain in Frameworks */,
+				D9E5CE9F2E5AEC0F001503EB /* Domain in Frameworks */,
 				D9E0B1592E59EAC000FE07A5 /* Composition in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,6 +117,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D9E5CEA22E5AECBA001503EB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				D962605C2E5973BD0032299B /* APIClientSample */,
@@ -121,6 +126,8 @@
 			packageProductDependencies = (
 				D9E0B1582E59EAC000FE07A5 /* Composition */,
 				D9E0B15A2E59EAC000FE07A5 /* Domain */,
+				D9E5CE9C2E5AEC0F001503EB /* Composition */,
+				D9E5CE9E2E5AEC0F001503EB /* Domain */,
 			);
 			productName = APIClientSample;
 			productReference = D962605A2E5973BD0032299B /* APIClientSample.app */;
@@ -205,6 +212,8 @@
 			mainGroup = D96260512E5973BD0032299B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				D9E5CE9B2E5AEC0F001503EB /* XCLocalSwiftPackageReference "APIModule" */,
+				D9E5CEA02E5AECAB001503EB /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D962605B2E5973BD0032299B /* Products */;
@@ -276,6 +285,10 @@
 			isa = PBXTargetDependency;
 			target = D96260592E5973BD0032299B /* APIClientSample */;
 			targetProxy = D96260722E5973C10032299B /* PBXContainerItemProxy */;
+		};
+		D9E5CEA22E5AECBA001503EB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = D9E5CEA12E5AECBA001503EB /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -564,6 +577,24 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		D9E5CE9B2E5AEC0F001503EB /* XCLocalSwiftPackageReference "APIModule" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = APIModule;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D9E5CEA02E5AECAB001503EB /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.59.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		D9E0B1582E59EAC000FE07A5 /* Composition */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -572,6 +603,19 @@
 		D9E0B15A2E59EAC000FE07A5 /* Domain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Domain;
+		};
+		D9E5CE9C2E5AEC0F001503EB /* Composition */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Composition;
+		};
+		D9E5CE9E2E5AEC0F001503EB /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+		D9E5CEA12E5AECBA001503EB /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D9E5CEA02E5AECAB001503EB /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
