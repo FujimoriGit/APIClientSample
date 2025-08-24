@@ -2,20 +2,20 @@ name: CI (SwiftLint + SwiftPM Build/Test + iOS App Build/Test)
 
 on:
   push:
-    branches: [ main, develop ]      # ← これらのブランチに push されたら起動
-  pull_request:                      # ← いずれのブランチ向け PR でも起動
+    branches: [ main, develop ]
+  pull_request:
 
 env:
-  WORKSPACE_PATH: APIClientSample.xcworkspace   # 例: repo-root/APIClientSample.xcworkspace
-  APP_SCHEME: APIClientSample                   # 例: 共有済みスキーム名（大小/スペース厳密）
-  PACKAGE_DIR: APIModule                  # 例: Package.swift があるディレクトリ
-  IOS_SIM_NAME: "iPhone 16 Pro"             # 例: 利用するシミュレータ名
-  IOS_SIM_OS: "latest"                  # 例: OS バージョン（latest か "18.0" のように固定も可）
+  WORKSPACE_PATH: APIClientSample.xcworkspace
+  APP_SCHEME: APIClientSample
+  PACKAGE_DIR: APIModule
+  IOS_SIM_NAME: "iPhone 16 Pro"
+  IOS_SIM_OS: "latest"
   DERIVED_DATA: ${{ github.workspace }}/.derivedData
 
 jobs:
   lint-build-test:
-    runs-on: macos-latest               # iOS シミュレータ/xcodebuild が使える macOS ランナー
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
@@ -31,11 +31,11 @@ jobs:
         run: swiftlint --strict
 
       - name: SwiftLint (APIModule package)
-        run: swiftlint --strict --path "$PACKAGE_DIR"
+        run: swiftlint --strict "$PACKAGE_DIR"
 
       - name: SwiftLint (App, if exists)
         run: |
-          if [ -d "App" ]; then swiftlint --strict --path App; fi
+          if [ -d "App" ]; then swiftlint --strict App; fi
 
       # ---------- Caches ----------
       - name: Cache SwiftPM / DerivedData
