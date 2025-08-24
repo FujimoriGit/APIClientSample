@@ -6,14 +6,19 @@ on:
   pull_request:
 
 env:
-  # Xcode固定（Xcode_16.4 が無い場合は 16.* を選ぶ手順に変えてください）
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app
-
   WORKSPACE_PATH: APIClientSample.xcworkspace
   APP_SCHEME: APIClientSample
 
-  # SPM クローン先を固定してキャッシュ対象にする
+  # SPM クローン先を固定（キャッシュ対象）
   SPM_CLONE_DIR: SourcePackages
+
+  # 速度寄せのビルドフラグ（副作用ほぼ無し）
+  XCODE_FLAGS: >
+    COMPILER_INDEX_STORE_ENABLE=NO
+    CLANG_ENABLE_CODE_COVERAGE=NO
+    DEBUG_INFORMATION_FORMAT=dwarf
+    ONLY_ACTIVE_ARCH=YES
+    SWIFT_COMPILATION_MODE=wholemodule
 
 jobs:
   build-test:
@@ -23,22 +28,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Xcode固定（xcode-select 方式）
-      - name: Select Xcode
-        run: sudo xcode-select -s "${DEVELOPER_DIR}/Contents/Developer"
+      - name: Select Xcode 16
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.*'
 
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      # ----（任意）SwiftLint：速さ優先なら外してOK ----
-      - name: Install tools (xcbeautify, swiftlint)
+      # ツール導入（brew updateしない）
+      - name: Install xcbeautify (and swiftlint optional)
         run: |
           brew install xcbeautify || true
-          brew install swiftlint || true
-      - name: SwiftLint (repo root)
-        run: swiftlint --strict || true
+          # brew install swiftlint || true   # 必要ならコメント解除
 
-      # ---- SPM キャッシュ（Xcode のクローン先を固定）----
+      # ---- SPM キャッシュ（Xcode の clone 先を固定）----
       - name: Cache Swift Packages
         uses: actions/cache@v4
         with:
@@ -46,7 +47,7 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
 
-      # 依存解決を先にやる（再ビルドを減らす）
+      # 依存解決を先に行う（テスト中の再解決を避ける）
       - name: Resolve Packages
         run: |
           set -o pipefail
@@ -56,10 +57,11 @@ jobs:
             -clonedSourcePackagesDirPath "$SPM_CLONE_DIR" \
             -skipPackagePluginValidation \
             -skipMacroValidation \
-            -resolvePackageDependencies
+            -resolvePackageDependencies \
+          | xcbeautify --is-ci
 
-      # テスト実行（見やすいログ＋結果バンドル保存）
-      - name: Test (pretty log + result bundle)
+      # 1回だけビルド（テスト用）
+      - name: Build for testing
         run: |
           set -o pipefail
           xcodebuild \
@@ -67,15 +69,36 @@ jobs:
             -scheme "$APP_SCHEME" \
             -configuration Debug \
             -destination "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -clonedSourcePackagesDirPath "$SPM_CLONE_DIR" \
             -skipPackagePluginValidation \
             -skipMacroValidation \
+            -destination-timeout 60 \
+            -parallel-testing-enabled YES \
+            $XCODE_FLAGS \
+            build-for-testing \
+          | xcbeautify --is-ci
+
+      # ビルド済みを使って高速実行
+      - name: Test without building
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace "$WORKSPACE_PATH" \
+            -scheme "$APP_SCHEME" \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,OS=latest,name=iPhone 16 Pro" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             -resultBundlePath "$RUNNER_TEMP/TestResults.xcresult" \
-            test \
+            -parallel-testing-enabled YES \
+            -maximum-concurrent-test-simulator-destinations 2 \
+            -destination-timeout 60 \
+            $XCODE_FLAGS \
+            test-without-building \
           | tee "$RUNNER_TEMP/xcodebuild-raw.log" \
           | xcbeautify --is-ci
 
-      #（任意）ビルド時間サマリ
+      # （任意）どこが重いか把握
       - name: Build timing summary
         if: always()
         run: |
@@ -83,7 +106,7 @@ jobs:
             -workspace "$WORKSPACE_PATH" \
             -scheme "$APP_SCHEME" || true
 
-      # 失敗時の成果物
+      # 失敗時の調査用成果物
       - name: Upload artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -92,3 +115,4 @@ jobs:
           path: |
             $RUNNER_TEMP/TestResults.xcresult
             $RUNNER_TEMP/xcodebuild-raw.log
+            $RUNNER_TEMP/DerivedData/Logs
