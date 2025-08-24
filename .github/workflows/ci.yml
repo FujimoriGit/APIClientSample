@@ -12,7 +12,6 @@ env:
   IOS_SIM_NAME: "iPhone 16 Pro"
   IOS_SIM_OS: "latest"
   DERIVED_DATA: ${{ github.workspace }}/.derivedData
-  RESULT_BUNDLE: ${{ runner.temp }}/TestResults.xcresult
 
 jobs:
   lint-build-test:
@@ -69,22 +68,10 @@ jobs:
       - name: List schemes (debug)
         run: xcodebuild -list -workspace "$WORKSPACE_PATH" || true
 
-      - name: Create & Boot Simulator
-        shell: bash
-        run: |
-          set -euo pipefail
-          DEVICE_ID=$(xcrun simctl list devices available | awk -v n="$IOS_SIM_NAME" -F '[()]' '$0 ~ n {print $2; exit}')
-          if [ -z "${DEVICE_ID:-}" ]; then
-            DEVICE_ID=$(xcrun simctl create "$IOS_SIM_NAME" "com.apple.CoreSimulator.SimDeviceType.$(echo "$IOS_SIM_NAME" | tr ' ' '-') " "com.apple.CoreSimulator.SimRuntime.iOS-${IOS_SIM_OS//./-}")
-          fi
-          xcrun simctl boot "${DEVICE_ID}" || true
-          xcrun simctl bootstatus "${DEVICE_ID}" -b -T 120
-
       - name: Test App (Debug, pretty log + result bundle)
         shell: bash
         run: |
           set -euo pipefail
-          # ログ整形しつつ、失敗時も生ログを残す
           xcodebuild \
             -workspace "$WORKSPACE_PATH" \
             -scheme "$APP_SCHEME" \
@@ -94,19 +81,19 @@ jobs:
             -skipPackagePluginValidation \
             -parallel-testing-enabled YES \
             -maximum-concurrent-test-simulator-destinations 2 \
-            -resultBundlePath "$RESULT_BUNDLE" \
+            -resultBundlePath "$RUNNER_TEMP/TestResults.xcresult" \
             test \
-          | tee $RUNNER_TEMP/xcodebuild-raw.log \
+          | tee "$RUNNER_TEMP/xcodebuild-raw.log" \
           | xcbeautify --is-ci
 
       - name: Build timing summary
         if: always()
         run: |
-            xcodebuild -showBuildTimingSummary \
-              -workspace "$WORKSPACE_PATH" \
-              -scheme "$APP_SCHEME" \
-              -configuration Debug \
-              -derivedDataPath "$DERIVED_DATA" || true
+          xcodebuild -showBuildTimingSummary \
+            -workspace "$WORKSPACE_PATH" \
+            -scheme "$APP_SCHEME" \
+            -configuration Debug \
+            -derivedDataPath "$DERIVED_DATA" || true
 
       # ---------- Artifacts ----------
       - name: Upload xcresult and logs (on failure)
@@ -115,8 +102,8 @@ jobs:
         with:
           name: xcode-artifacts
           path: |
-            ${{ env.RESULT_BUNDLE }}
             ${{ env.DERIVED_DATA }}/Logs
+            $RUNNER_TEMP/TestResults.xcresult
             $RUNNER_TEMP/xcodebuild-raw.log
             ~/Library/Logs/DiagnosticReports
             ~/Library/Logs/CoreSimulator
