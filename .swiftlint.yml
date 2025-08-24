@@ -62,6 +62,7 @@ final_test_case: *unit_test_configuration
 function_body_length: 60
 identifier_name:
   excluded:
+  - "**/*Tests"
     - id
 large_tuple: 3
 number_separator:
