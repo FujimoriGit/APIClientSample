@@ -42,12 +42,12 @@ disabled_rules:
   - private_over_fileprivate
   # if ブロックで return していても elseを記載した方が見やすいケースがあると思うのでルール削除
   - superfluous_else
-  # fileprivate を避ける理由がよくわからぬ！
-  - private_over_fileprivate
   - file_header
   - file_name
   # let, varを宣言するときは改行入れないといけないらしい（入れたくない時もあるのでdisable）
   - let_var_whitespace
+  - no_empty_block
+  - unneeded_synthesized_initializer
 
 # Configurations
 balanced_xctest_lifecycle: &unit_test_configuration
