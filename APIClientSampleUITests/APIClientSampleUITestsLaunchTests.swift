@@ -5,12 +5,11 @@
 //  Created by Daiki Fujimori on 2025/08/23
 //  
 
-
 import XCTest
 
 final class APIClientSampleUITestsLaunchTests: XCTestCase {
 
-    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+    override static var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }
 

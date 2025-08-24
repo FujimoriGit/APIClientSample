@@ -39,7 +39,6 @@ playground.xcworkspace
 #
 # Pods/
 #
-*.xcworkspace
 
 # Carthage
 #
@@ -59,6 +58,3 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-APIClientSample.xcworkspace/contents.xcworkspacedata
-APIModule/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
-contents.xcworkspacedata
