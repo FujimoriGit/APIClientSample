@@ -5,17 +5,17 @@ import PackageDescription
 
 let package = Package(
     name: "APIModule",
-    platforms: [.iOS(.v18)],
+    platforms: [
+        .iOS(.v18)
+    ],
     products: [
         .library(name: "Domain", targets: ["Domain"]),
         .library(name: "Composition", targets: ["Composition"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", exact: "0.59.1")
+        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3")
     ],
     targets: [
-        // Domain（公開）
         .target(
             name: "Domain",
             dependencies: [],
@@ -23,11 +23,8 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .release))
-            ], plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
-        // Data（非公開）
         .target(
             name: "Data",
             dependencies: [
@@ -38,11 +35,8 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .release))
-            ], plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
-        // Composition（公開）
         .target(
             name: "Composition",
             dependencies: [
@@ -54,11 +48,8 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .release))
-            ], plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
-        // Tests（必要ならテストにも適用可）
         .testTarget(
             name: "DataTests",
             dependencies: ["Data"],
@@ -66,8 +57,6 @@ let package = Package(
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .release))
-            ], plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         )
     ]
