@@ -12,6 +12,7 @@ env:
   IOS_SIM_NAME: "iPhone 16 Pro"
   IOS_SIM_OS: "latest"
   DERIVED_DATA: ${{ github.workspace }}/.derivedData
+  RESULT_BUNDLE: ${{ runner.temp }}/TestResults.xcresult
 
 jobs:
   lint-build-test:
@@ -27,10 +28,10 @@ jobs:
             xcode-version: '16.*'
 
       # ---------- SwiftLint ----------
-      - name: Install SwiftLint (Homebrew)
+      - name: Install tools (SwiftLint & xcbeautify)
         run: |
           brew update
-          brew install swiftlint
+          brew install swiftlint xcbeautify
 
       - name: SwiftLint (repo root)
         run: swiftlint --strict
@@ -68,8 +69,22 @@ jobs:
       - name: List schemes (debug)
         run: xcodebuild -list -workspace "$WORKSPACE_PATH" || true
 
-      - name: Test App (Debug)
+      - name: Create & Boot Simulator
+        shell: bash
         run: |
+          set -euo pipefail
+          DEVICE_ID=$(xcrun simctl list devices available | awk -v n="$IOS_SIM_NAME" -F '[()]' '$0 ~ n {print $2; exit}')
+          if [ -z "${DEVICE_ID:-}" ]; then
+            DEVICE_ID=$(xcrun simctl create "$IOS_SIM_NAME" "com.apple.CoreSimulator.SimDeviceType.$(echo "$IOS_SIM_NAME" | tr ' ' '-') " "com.apple.CoreSimulator.SimRuntime.iOS-${IOS_SIM_OS//./-}")
+          fi
+          xcrun simctl boot "${DEVICE_ID}" || true
+          xcrun simctl bootstatus "${DEVICE_ID}" -b -T 120
+
+      - name: Test App (Debug, pretty log + result bundle)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # ログ整形しつつ、失敗時も生ログを残す
           xcodebuild \
             -workspace "$WORKSPACE_PATH" \
             -scheme "$APP_SCHEME" \
@@ -77,15 +92,31 @@ jobs:
             -destination "platform=iOS Simulator,name=${IOS_SIM_NAME},OS=${IOS_SIM_OS}" \
             -derivedDataPath "$DERIVED_DATA" \
             -skipPackagePluginValidation \
-            -quiet test
+            -parallel-testing-enabled YES \
+            -maximum-concurrent-test-simulator-destinations 2 \
+            -resultBundlePath "$RESULT_BUNDLE" \
+            test \
+          | tee $RUNNER_TEMP/xcodebuild-raw.log \
+          | xcbeautify --is-ci
 
-      # ---------- Logs on failure ----------
-      - name: Archive Logs (on failure)
+      - name: Build timing summary
+        if: always()
+        run: |
+            xcodebuild -showBuildTimingSummary \
+              -workspace "$WORKSPACE_PATH" \
+              -scheme "$APP_SCHEME" \
+              -configuration Debug \
+              -derivedDataPath "$DERIVED_DATA" || true
+
+      # ---------- Artifacts ----------
+      - name: Upload xcresult and logs (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: xcode-logs
+          name: xcode-artifacts
           path: |
+            ${{ env.RESULT_BUNDLE }}
             ${{ env.DERIVED_DATA }}/Logs
+            $RUNNER_TEMP/xcodebuild-raw.log
             ~/Library/Logs/DiagnosticReports
             ~/Library/Logs/CoreSimulator
