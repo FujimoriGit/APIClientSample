@@ -57,10 +57,6 @@ jobs:
         working-directory: ${{ env.PACKAGE_DIR }}
         run: swift package resolve
 
-      - name: Swift Package - Build
-        working-directory: ${{ env.PACKAGE_DIR }}
-        run: swift build -v
-
       - name: Swift Package - Test
         working-directory: ${{ env.PACKAGE_DIR }}
         run: swift test -v
@@ -71,17 +67,6 @@ jobs:
 
       - name: List schemes (debug)
         run: xcodebuild -list -workspace "$WORKSPACE_PATH" || true
-
-      - name: Build App (Debug)
-        run: |
-          xcodebuild \
-            -workspace "$WORKSPACE_PATH" \
-            -scheme "$APP_SCHEME" \
-            -configuration Debug \
-            -destination "platform=iOS Simulator,name=${IOS_SIM_NAME},OS=${IOS_SIM_OS}" \
-            -derivedDataPath "$DERIVED_DATA" \
-            -skipPackagePluginValidation \
-            -quiet build
 
       - name: Test App (Debug)
         run: |
