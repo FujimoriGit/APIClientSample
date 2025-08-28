@@ -4,7 +4,7 @@ import Domain
 import Moya
 
 @MainActor
-public final class APIClient: APIRequesting {
+public final class APIClient: @preconcurrency APIRequesting {
     @Dependency(\.network) private var network
 
     public init() {}
