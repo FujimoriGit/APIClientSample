@@ -2,7 +2,7 @@ import Foundation
 import Moya
 import Alamofire
 
-public protocol NetworkProviding {
+public protocol NetworkProviding: Sendable {
     var session: Alamofire.Session { get }
     func request(
         _ target: TargetType,
@@ -38,3 +38,5 @@ public struct MoyaNetworkProvider: NetworkProviding {
         )
     }
 }
+
+extension MoyaNetworkProvider: @unchecked Sendable {}

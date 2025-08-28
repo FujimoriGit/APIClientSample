@@ -3,6 +3,7 @@ import Dependencies
 import Domain
 import Moya
 
+@MainActor
 public final class APIClient: APIRequesting {
     @Dependency(\.network) private var network
 

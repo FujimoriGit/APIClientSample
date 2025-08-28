@@ -7,7 +7,10 @@ public enum NetworkProviderKey: DependencyKey {
         return MoyaNetworkProvider(session: session, plugins: [])
     }()
     public static var testValue: NetworkProviding {
-        unimplemented("NetworkProviding.testValue is not set")
+        unimplemented(
+            "NetworkProviding.testValue is not set",
+            placeholder: MoyaNetworkProvider(session: Session(configuration: .default))
+        )
     }
 }
 
