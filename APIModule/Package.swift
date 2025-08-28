@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "APIModule",
     platforms: [
-        .iOS(.v18)
+        .iOS(.v18),
+        .macOS(.v10_15)
     ],
     products: [
         .library(name: "Domain", targets: ["Domain"]),
