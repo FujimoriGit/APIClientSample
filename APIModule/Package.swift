@@ -13,7 +13,9 @@ let package = Package(
         .library(name: "Composition", targets: ["Composition"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3")
+        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.8.1"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies.git", from: "1.0.0")
     ],
     targets: [
         .target(
@@ -29,7 +31,9 @@ let package = Package(
             name: "Data",
             dependencies: [
                 "Domain",
-                .product(name: "Moya", package: "Moya")
+                .product(name: "Moya", package: "Moya"),
+                .product(name: "Alamofire", package: "Alamofire"),
+                .product(name: "Dependencies", package: "swift-dependencies")
             ],
             path: "Sources/Data",
             swiftSettings: [
@@ -52,7 +56,12 @@ let package = Package(
         ),
         .testTarget(
             name: "DataTests",
-            dependencies: ["Data"],
+            dependencies: [
+                "Data",
+                .product(name: "Moya", package: "Moya"),
+                .product(name: "Alamofire", package: "Alamofire"),
+                .product(name: "Dependencies", package: "swift-dependencies")
+            ],
             path: "Tests/DataTests",
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),

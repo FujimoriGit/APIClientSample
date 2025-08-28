@@ -1,14 +1,21 @@
-//
-//  APIClient.swift
-//  APIClientSample
-//  
-//  Created by Daiki Fujimori on 2025/08/23
-//  
-
+import Foundation
+import Dependencies
 import Domain
 import Moya
 
-package final class APIClient: APIRequesting {
+public final class APIClient: APIRequesting {
+    @Dependency(\.network) private var network
 
-    package init() {}
+    public init() {}
+
+    public func fetchUser(id: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        network.request(UserAPI.getUser(id: id), callbackQueue: .main, progress: nil) { result in
+            switch result {
+            case .success(let response):
+                completion(.success(response.data))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
 }
