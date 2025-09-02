@@ -48,6 +48,8 @@ disabled_rules:
   - let_var_whitespace
   - no_empty_block
   - unneeded_synthesized_initializer
+  - attributes
+  - statement_position
 
 # Configurations
 balanced_xctest_lifecycle: &unit_test_configuration
