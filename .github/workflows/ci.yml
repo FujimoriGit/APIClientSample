@@ -44,15 +44,32 @@ jobs:
             xcodebuild -resolvePackageDependencies -project APIClientSample.xcodeproj
           fi
 
-      # 4. Build（コード署名無効 / 検証スキップ）
+      # 4. Build（workspace があればそちらを優先）
       - name: Build
+        shell: bash
         run: |
-          xcodebuild build \
-            -project APIClientSample.xcodeproj \
-            -scheme APIClientSample \
-            -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16 Pro' \
-            -skipPackagePluginValidation \
-            -skipMacroValidation \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-          | xcpretty
+          set -euo pipefail
+          WS=$(find . -name "*.xcworkspace" -type d | head -n1 || true)
+          if [[ -n "${WS}" ]]; then
+            echo "Building via workspace: ${WS}"
+            xcodebuild build \
+              -workspace "${WS}" \
+              -scheme APIClientSample \
+              -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16 Pro' \
+              -skipPackagePluginValidation \
+              -skipMacroValidation \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
+          else
+            echo "Building via project: APIClientSample.xcodeproj"
+            xcodebuild build \
+              -project APIClientSample.xcodeproj \
+              -scheme APIClientSample \
+              -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16 Pro' \
+              -skipPackagePluginValidation \
+              -skipMacroValidation \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
+          fi
