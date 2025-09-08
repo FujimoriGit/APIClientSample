@@ -12,11 +12,15 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # 1. リポジトリをチェックアウト
+      # 1. Swift Packageの依存解決（APIModule 配下）
+      - name: Resolve SwiftPM for APIModule
+        working-directory: APIClientSample-add_api_framework_and_integration_test/APIModule
+        run: swift package resolve
+      # 2. リポジトリをチェックアウト
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
-      # 2. DerivedData をキャッシュ
+      # 3. DerivedData をキャッシュ
       - name: Cache DerivedData
         uses: actions/cache@v4.2.3
         with:
@@ -25,22 +29,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-xcode-derived-
 
-      # 3. Xcode のセットアップ
+      # 4. Xcode のセットアップ
       - name: Setup Xcode (latest stable)
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
 
-      # 4. SPM 依存解決（Xcodeプロジェクト）
+      # 5. SPM 依存解決（Xcodeプロジェクト）
       - name: Resolve Swift Packages
         run: xcodebuild -resolvePackageDependencies -project APIClientSample.xcodeproj
 
-      # 4.5 SwiftPM パッケージ単体テスト（APIModule）
+      # 5.5 SwiftPM パッケージ単体テスト（APIModule）
       - name: SwiftPM Package Test (APIModule)
         working-directory: APIModule
         run: swift test -v
 
-      # 5. ビルド
+      # 6. ビルド
       - name: Build (with SwiftLint if enabled)
         run: |
           xcodebuild build \
