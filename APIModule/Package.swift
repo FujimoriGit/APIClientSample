@@ -13,7 +13,8 @@ let package = Package(
         .library(name: "Composition", targets: ["Composition"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3")
+        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.10.2")
     ],
     targets: [
         .target(
@@ -29,7 +30,8 @@ let package = Package(
             name: "Data",
             dependencies: [
                 "Domain",
-                .product(name: "Moya", package: "Moya")
+                .product(name: "Moya", package: "Moya"),
+                .product(name: "Alamofire", package: "Alamofire")
             ],
             path: "Sources/Data",
             swiftSettings: [
@@ -42,7 +44,8 @@ let package = Package(
             dependencies: [
                 "Domain",
                 "Data",
-                .product(name: "Moya", package: "Moya")
+                .product(name: "Moya", package: "Moya"),
+                .product(name: "Alamofire", package: "Alamofire")
             ],
             path: "Sources/Composition",
             swiftSettings: [

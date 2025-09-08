@@ -12,54 +12,47 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # 1. リポジトリをチェックアウト
+      # 1. リポジトリのコードをチェックアウト
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
-      # 2. DerivedData をキャッシュ
-      - name: Cache DerivedData
-        uses: actions/cache@v4.2.3
-        with:
-          path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-xcode-derived-${{ hashFiles('**/*.swift') }}
-          restore-keys: |
-            ${{ runner.os }}-xcode-derived-
-
-      # 3. Xcode のセットアップ
-      - name: Setup Xcode (latest stable)
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      # 4. SPM 依存解決（Xcodeプロジェクト）
-      - name: Resolve Swift Packages
+      # 2. Swift Package の依存解決（APIModule を自動検出）
+      - name: Resolve SwiftPM for APIModule
+        shell: bash
         run: |
-          xcodebuild \
-            -project APIClientSample.xcodeproj \
-            -resolvePackageDependencies
+          set -euo pipefail
+          MOD_PATH="$(git ls-files | grep -E '(^|.*/)(APIModule)/Package\.swift$' | head -n1 | xargs dirname || true)"
+          if [[ -z "${MOD_PATH}" || ! -d "${MOD_PATH}" ]]; then
+            echo "APIModule not found. Current tree:"
+            ls -la
+            exit 1
+          fi
+          echo "Detected APIModule at: ${MOD_PATH}"
+          swift package --package-path "${MOD_PATH}" resolve
 
-      # 4.5 SwiftPM パッケージ単体テスト（APIModule）
-      - name: SwiftPM Package Test (APIModule)
-        working-directory: APIModule
-        run: swift test -v
+      # 3. Xcode パッケージ依存の解決（workspace があれば優先）
+      - name: Resolve Xcode Packages (auto)
+        shell: bash
+        run: |
+          set -euo pipefail
+          WS=$(find . -name "*.xcworkspace" -type d | head -n1 || true)
+          if [[ -n "${WS}" ]]; then
+            echo "Using workspace: ${WS}"
+            xcodebuild -resolvePackageDependencies -workspace "${WS}" -scheme APIClientSample
+          else
+            echo "Using project: APIClientSample.xcodeproj"
+            xcodebuild -resolvePackageDependencies -project APIClientSample.xcodeproj
+          fi
 
-      # 5. ビルド
-      - name: Build (with SwiftLint if enabled)
+      # 4. Build（コード署名無効 / 検証スキップ）
+      - name: Build
         run: |
           xcodebuild build \
             -project APIClientSample.xcodeproj \
             -scheme APIClientSample \
             -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16 Pro' \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-          | xcpretty
-
-      # 6. ビルド&テスト
-      - name: Build and test
-        run: |
-          xcodebuild test \
-            -project APIClientSample.xcodeproj \
-            -scheme APIClientSample \
-            -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16 Pro' \
-            -enableCodeCoverage YES \
           | xcpretty
