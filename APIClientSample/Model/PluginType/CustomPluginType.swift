@@ -11,7 +11,7 @@ struct CustomPluginType {}
 
 extension CustomPluginType: APIPluginType {
     func process(_ result: Result<Domain.APIResponse, Domain.APIError>,
-                 target: any APITargetType) -> Result<Domain.APIResponse, Domain.APIError> {
+                 target: APITargetType) -> Result<Domain.APIResponse, Domain.APIError> {
         
         switch result {
             
