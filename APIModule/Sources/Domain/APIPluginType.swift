@@ -6,19 +6,10 @@
 //  
 
 import Foundation
-import Moya
 
-public protocol APIPluginType: PluginType {
-    
+public protocol APIPluginType: Sendable {
+
     func process(_ result: Result<APIResponse, APIError>, target: APITargetType) -> Result<APIResponse, APIError>
-}
-
-extension APIPluginType {
-    
-    func process(_ result: Result<Moya.Response, MoyaError>, target: TargetType) -> Result<Moya.Response, MoyaError> {
-        
-        process(result, target: target)
-    }
 }
 
 public enum APIHTTPMethod: String, CaseIterable {
@@ -39,10 +30,15 @@ public enum APIValidationType {
     case custom([Int])
 }
 
+public enum APIParameterEncoding {
+    case url
+    case json
+}
+
 public enum APITask {
     case requestPlain
     case requestData(Data)
-    case requestParameters([String: Any], encoding: ParameterEncoding)
+    case requestParameters([String: Any], encoding: APIParameterEncoding)
     // 必要に応じて追加
 }
 
