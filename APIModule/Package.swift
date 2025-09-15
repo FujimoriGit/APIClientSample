@@ -19,7 +19,11 @@ let package = Package(
     targets: [
         .target(
             name: "Domain",
-            dependencies: [],
+            dependencies: [
+                // 本当は依存しちゃダメ
+                .product(name: "Alamofire", package: "Alamofire"),
+                .product(name: "Moya", package: "Moya")
+            ],
             path: "Sources/Domain",
             swiftSettings: [
                 .unsafeFlags(["-strict-concurrency=complete"], .when(configuration: .debug)),

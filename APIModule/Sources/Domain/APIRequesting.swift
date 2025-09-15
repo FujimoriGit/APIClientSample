@@ -34,10 +34,6 @@ public extension APIRequesting {
     }
 }
 
-// MARK: - APITargetType
-
-public protocol APITargetType: TargetType {}
-
 // MARK: - APIResponse
 
 public struct APIResponse: Sendable {
@@ -124,29 +120,3 @@ public extension MoyaError {
         }
     }
 }
-
-// MARK: - CustomSession
-
-public class CustomSession: Alamofire.Session, @unchecked Sendable {
-    static func create(
-        protocolClasses: [AnyClass]? = nil,
-        timeoutIntervalForRequest: TimeInterval = 30,
-        requestCachePolicy: NSURLRequest.CachePolicy = .reloadIgnoringLocalCacheData,
-        interceptors: [APIInterceptor]
-    ) -> CustomSession {
-        
-        let configuration = URLSessionConfiguration.default
-        
-        configuration.protocolClasses = []
-        configuration.timeoutIntervalForRequest = 0
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        
-        let interceptor = Interceptor(interceptors: interceptors)
-        
-        return .init(configuration: configuration, interceptor: interceptor)
-    }
-}
-
-// MARK: - APIInterceptor
-
-public protocol APIInterceptor: RequestInterceptor {}
