@@ -11,7 +11,11 @@ import Foundation
 
 private enum APIProviderKey: DependencyKey {
     
-    static let liveValue = Composition.make(session: .init())
+    static let liveValue = {
+        
+        let session = CustomSession.make()
+        return Composition.make(session: session)
+    }()
 }
 
 extension DependencyValues {
