@@ -5,16 +5,12 @@
 //  Created by Daiki Fujimori on 2025/08/23
 //  
 
-import Alamofire
 import Foundation
-import Moya
 
 // MARK: - APIRequesting
 
 public protocol APIRequesting: Sendable {
-    
-    var session: CustomSession { get }
-    
+
     func request(
         target: APITargetType,
         callbackQueue: DispatchQueue?,
@@ -23,13 +19,13 @@ public protocol APIRequesting: Sendable {
 }
 
 public extension APIRequesting {
-    
+
     func request(
         target: APITargetType,
         callbackQueue: DispatchQueue? = nil,
         completion: @escaping (Result<APIResponse, APIError>) -> Void
     ) {
-        
+
         request(target: target, callbackQueue: callbackQueue, completion: completion)
     }
 }
@@ -37,7 +33,7 @@ public extension APIRequesting {
 // MARK: - APIResponse
 
 public struct APIResponse: Sendable {
-    
+
     /// The status code of the response.
     public let statusCode: Int
 
@@ -49,16 +45,6 @@ public struct APIResponse: Sendable {
 
     /// The HTTPURLResponse object.
     public let response: HTTPURLResponse?
-}
-
-// MARK: - Moya.Response extension for APIResponse
-
-public extension Moya.Response {
-    
-    var apiResponse: APIResponse {
-        
-        .init(statusCode: statusCode, data: data, request: request, response: response)
-    }
 }
 
 // MARK: - APIError
@@ -91,32 +77,4 @@ public enum APIError: Swift.Error {
 
     /// Indicates that an `Endpoint` failed to encode the parameters for the `URLRequest`.
     case parameterEncoding(Swift.Error)
-}
-
-// MARK: - MoyaError extension for APIError
-
-public extension MoyaError {
-    
-    var apiError: APIError {
-        switch self {
-        case .imageMapping(let response):
-            return .imageMapping(response.apiResponse)
-        case .jsonMapping(let response):
-            return .jsonMapping(response.apiResponse)
-        case .stringMapping(let response):
-            return .stringMapping(response.apiResponse)
-        case .objectMapping(let error, let response):
-            return .objectMapping(error, response.apiResponse)
-        case .encodableMapping(let error):
-            return .encodableMapping(error)
-        case .statusCode(let response):
-            return .statusCode(response.apiResponse)
-        case .underlying(let error, let response):
-            return .underlying(error, response?.apiResponse)
-        case .requestMapping(let string):
-            return .requestMapping(string)
-        case .parameterEncoding(let error):
-            return .parameterEncoding(error)
-        }
-    }
 }

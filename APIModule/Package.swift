@@ -20,9 +20,6 @@ let package = Package(
         .target(
             name: "Domain",
             dependencies: [
-                // 本当は依存しちゃダメ
-                .product(name: "Alamofire", package: "Alamofire"),
-                .product(name: "Moya", package: "Moya")
             ],
             path: "Sources/Domain",
             swiftSettings: [
@@ -47,9 +44,7 @@ let package = Package(
             name: "Composition",
             dependencies: [
                 "Domain",
-                "Data",
-                .product(name: "Moya", package: "Moya"),
-                .product(name: "Alamofire", package: "Alamofire")
+                "Data"
             ],
             path: "Sources/Composition",
             swiftSettings: [
