@@ -67,20 +67,20 @@ extension AuthInterceptor: AuthIntercepting {
     func retry(_ request: APIRequest,
                dueTo error: any Error,
                completion: @escaping @Sendable (Domain.APIRetryResult) -> Void) {
-        
-        guard let statusCode = request.request.response?.statusCode,
+
+        guard let statusCode = request.statusCode,
               statusCodesToHandle.contains(statusCode) else {
-            
+
             completion(.doNotRetry)
             return
         }
-        
-        guard request.request.retryCount < retryMaxCount else {
-            
+
+        guard request.retryCount < retryMaxCount else {
+
             completion(.doNotRetryWithError(AuthInterceptError.retryLimit))
             return
         }
-        
+
         completion(.retry)
     }
 }
